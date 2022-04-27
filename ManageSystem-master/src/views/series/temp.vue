@@ -7,8 +7,8 @@
             type="primary"
             icon="el-icon-plus"
             size="mini"
-            @click="addDialogVisible = true"
-            >添加</el-button
+            @click="addClick"
+            >创建</el-button
           >
           <el-button
             :disabled="currentRow === null"
@@ -31,7 +31,7 @@
           <div style="margin-right: 5px">
             <el-input
               size="mini"
-              placeholder="请输入角色名"
+              placeholder="请输入模板名"
               @keyup.enter="getList"
               prefix-icon="el-icon-search"
               v-model="listQuery.searchInfo"
@@ -61,45 +61,18 @@
         style="width: 100%"
       >
         <el-table-column prop="id" label="序号"> </el-table-column>
-        <el-table-column prop="roleName" label="角色名"> </el-table-column>
+        <el-table-column prop="name" label="模板名称"> </el-table-column>
+        <el-table-column fixed="right" label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button @click="handleClick(scope.row)" type="text" size="small"
+              >查看详情</el-button
+            >
+            
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
     <!-- /列表栏 -->
-
-    <!-- 添加对话框 -->
-    <el-dialog
-      v-if="addDialogVisible"
-      title="新建角色"
-      :visible.sync="addDialogVisible"
-      width="700px"
-    >
-      <el-form
-        ref="create"
-        :model="createForm"
-        :rules="rules"
-        label-position="left"
-        label-width="80px"
-        style="padding: 0 20px"
-        @keyup.enter.native="submitForm('create')"
-      >
-        <el-form-item label="角色名" prop="roleName">
-          <el-input
-            v-model="createForm.roleName"
-            maxlength="20"
-            clearable
-            placeholder="请输入角色名"
-          />
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" size="mini" @click="submitForm('create')"
-            >创建</el-button
-          >
-          <!-- <el-button @click="resetForm('create')">重置</el-button> -->
-        </el-form-item>
-      </el-form>
-    </el-dialog>
-    <!-- 添加对话框 -->
 
     <!-- 修改对话框 -->
     <el-dialog title="编辑信息" :visible.sync="editDialogVisible" width="700px">
@@ -112,12 +85,12 @@
         style="padding: 0 20px"
         @keyup.enter.native="submitForm('edit')"
       >
-        <el-form-item label="角色名" prop="roleName">
+        <el-form-item label="模板名称" prop="roleName">
           <el-input
-            v-model="editForm.roleName"
+            v-model="editForm.name"
             maxlength="20"
             clearable
-            placeholder="请输入角色名"
+            placeholder="请输入模板名称"
           />
         </el-form-item>
 
@@ -130,6 +103,12 @@
       </el-form>
     </el-dialog>
     <!-- 修改对话框 -->
+
+    <!-- 详情对话框 -->
+    <el-dialog title="模板详情" :visible.sync="infoDialogVisible" width="700px">
+      <tempBuild :tempData="tempData" />
+    </el-dialog>
+    <!-- 详情对话框 -->
 
     <!-- 分页栏 -->
     <div class="footer">
@@ -153,28 +132,41 @@
 import { request } from "@/utils/request";
 import qs from "qs";
 import { mapGetters, mapState } from "vuex";
-import { deepCopy } from "@/utils/method";
 import { underscore2camelCase } from "@/utils/index";
-
+import tempBuild from "@/components/form/formBuild";
 export default {
   name: "temp",
+  components: { tempBuild },
   data() {
     return {
-      list: [],
-      cacheList: [],
-      listLoading: true,
+      list: [
+        {
+          id: 1,
+          name: "设备",
+        },
+      ],
+      listLoading: false,
       currentRow: null,
+      editDialogVisible: false,
+      infoDialogVisible: false,
+      tempData: '',
       listQuery: {
         currentPage: 1,
         pageSize: 20,
         total: 400,
         searchInfo: "",
       },
-      addDialogVisible: false,
-      editDialogVisible: false,
+      createForm: {
+        name: "",
+        json: "",
+      },
+      editForm: {
+        name: "",
+        json: "",
+      },
       rules: {
-        roleName: [
-          { required: true, message: "角色名称不能为空", trigger: "blur" },
+        tempName: [
+          { required: true, message: "模板名称不能为空", trigger: "blur" },
           {
             min: 2,
             max: 20,
@@ -183,16 +175,10 @@ export default {
           },
         ],
       },
-      createForm: {
-        roleName: "",
-      },
-      editForm: {
-        roleName: "",
-      },
     };
   },
   computed: {
-    ...mapGetters(["roleOptions"]),
+    // ...mapGetters(["roleOptions"]),
   },
   created() {
     this.getList();
@@ -204,16 +190,14 @@ export default {
     getList() {
       console.log(this.listQuery);
       request({
-        url: `/role/getRoles?${qs.stringify(this.listQuery)} `,
+        url: `/temp/getTemp?${qs.stringify(this.listQuery)} `,
         method: "get",
       })
         .then((res) => {
           console.log(res);
           if (res.status === 0) {
-            this.list = res.data.list
-            this.list.forEach(item => {
-                item.roleName = item.name
-            })
+            this.list = res.data.list;
+
             this.listQuery.currentPage = parseInt(res.data.currentPage);
             this.listQuery.total = res.data.total;
             console.log(this.list);
@@ -244,7 +228,6 @@ export default {
         if (valid) {
           switch (formName) {
             case "create":
-              this.handleCreate();
               break;
             case "edit":
               this.handleEdit();
@@ -253,36 +236,13 @@ export default {
         }
       });
     },
-    /**
-     * 新建
-     */
-    async handleCreate() {
-      console.log(this.createForm);
-      let res = await request({
-        url: `/role/addRole`,
-        method: "post",
-        data: qs.stringify(this.createForm),
-      });
-
-      if (res) {
-        console.log(res);
-        if (res.status === 0) {
-          this.$notify.success({
-            title: "成功",
-            message: res.message,
-            duration: 1500,
-          });
-          this.addDialogVisible = false;
-          this.getList();
-          this.createForm.roleName = ''
-        } else {
-          this.$notify.error({
-            title: "失败",
-            message: res.message,
-            duration: 1500,
-          });
-        }
-      }
+    // 跳转表单创建页面
+    addClick() {
+      this.$router.push("/tempDesign");
+    },
+    handleClick(row) {
+      this.infoDialogVisible = true
+      this.tempData = JSON.parse(row.form_json)
     },
     /**
      * 修改显示框
@@ -297,9 +257,9 @@ export default {
      */
     async handleEdit() {
       this.editForm.id = this.currentRow.id;
-
+      console.log(this.editForm);
       let res = await request({
-        url: `/role/updateRole`,
+        url: `/temp/updateTemp`,
         method: "post",
         data: qs.stringify(this.editForm),
       });
@@ -320,30 +280,13 @@ export default {
       }
     },
     /**
-     * 前端比对记录是否更改
-     * （性能优化）
-     */
-    compareRow() {
-      let arr1 = [];
-      let arr2 = [];
-      this.cacheList[this.currentRow.index].role_id.map((item, index) => {
-        arr1[index] = item;
-      });
-      this.editForm.role_id.map((item, index) => {
-        arr2[index] = item;
-      });
-      // 排序 比较
-      this.editForm.ischanged =
-        arr1.sort().toString() == arr2.sort().toString();
-    },
-    /**
      * 删除
      */
     deleteClick() {
       this.$confirm("删除后无法撤销，确定删除?", "提示", { type: "warning" })
         .then(() => {
           request({
-            url: `/role/deleteRole/${this.currentRow.id}`,
+            url: `/temp/deleteTemp/${this.currentRow.id}`,
             method: "post",
           }).then((res) => {
             if (res.status === 0) {

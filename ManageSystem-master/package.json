@@ -8,10 +8,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "ant-design-vue": "^3.2.2",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
     "element-ui": "^2.13.0",
     "js-cookie": "^2.2.1",
+    "k-form-design": "^3.7.91",
     "less-loader": "^6.0.0",
     "qs": "^6.9.1",
     "vue": "^2.6.11",

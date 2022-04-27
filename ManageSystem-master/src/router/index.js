@@ -3,6 +3,8 @@ import Router from 'vue-router'
 
 import Login from 'views/login/Login'
 
+import tempDesign from '../components/form/tempDesign'
+
 import Layout from '@/layout/index' 
 
 Vue.use(Router)
@@ -40,9 +42,17 @@ const routes = [
             {
                 path: '/business',
                 component: () => import('views/series/business')
+            },
+            {
+                path: '/template',
+                component: () => import('views/series/temp')
             }
         ]
     },
+    {
+        path: '/tempDesign',
+        component: tempDesign
+    }
     
 
 

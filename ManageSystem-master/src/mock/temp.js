@@ -1,5 +1,5 @@
 export default {
-    getInfoList: () => {
+    getTempList: () => {
         return {
             "data": [
                 {

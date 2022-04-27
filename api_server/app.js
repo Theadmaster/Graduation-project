@@ -49,6 +49,10 @@ app.use('/role', roleRouter)
 const businessRouter = require('./router/business')
 app.use('/business', businessRouter)
 
+// 导入模板模块
+const tempRouter = require('./router/temp')
+app.use('/temp', tempRouter)
+
 // 导入使用文章分类路由模块
 const articleCateRouter = require('./router/articleCate')
 app.use('/my/article', articleCateRouter)

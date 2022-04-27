@@ -12,6 +12,10 @@ Vue.use(Element)
 
 Vue.config.productionTip = false
 
+import KFormDesign from 'k-form-design'
+import 'k-form-design/lib/k-form-design.css'
+Vue.use(KFormDesign)
+
 // Vue.prototype.$store = store
 
 new Vue({

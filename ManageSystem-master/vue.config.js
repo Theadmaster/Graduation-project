@@ -9,5 +9,16 @@ module.exports = {
                 views: '@/views'
             }
         }
+    },
+    css: {
+        loaderOptions: {
+            less: {
+              modifyVars: {
+                'primary-color': '#13c2c2',
+                'layout-color': '#666'
+              },
+              javascriptEnabled: true
+            }
+        }
     }
 }
