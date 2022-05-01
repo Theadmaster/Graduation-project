@@ -11,7 +11,7 @@
  Target Server Version : 50728
  File Encoding         : 65001
 
- Date: 27/04/2022 12:00:52
+ Date: 01/05/2022 13:07:38
 */
 
 SET NAMES utf8mb4;
@@ -118,12 +118,13 @@ CREATE TABLE `business`  (
   `type` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `orderCount` int(50) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of business
 -- ----------------------------
 INSERT INTO `business` VALUES (1, '杭州金点子有限公司', '林先生', '13956563434', '浙江省杭州市临安区科创大厦', '1', 10);
+INSERT INTO `business` VALUES (2, '思聪', 'Gert', '19858185202', '浙江省杭州市', '技术服务', 11);
 
 -- ----------------------------
 -- Table structure for dict
@@ -139,6 +140,46 @@ CREATE TABLE `dict`  (
 -- Records of dict
 -- ----------------------------
 INSERT INTO `dict` VALUES (1, NULL);
+
+-- ----------------------------
+-- Table structure for form
+-- ----------------------------
+DROP TABLE IF EXISTS `form`;
+CREATE TABLE `form`  (
+  `id` int(50) NOT NULL AUTO_INCREMENT,
+  `form_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `form_date` date NULL DEFAULT NULL,
+  `form_json` json NULL,
+  `form_temp_id` int(50) NULL DEFAULT NULL,
+  `approval` int(10) NULL DEFAULT 0 COMMENT '审批 0：未审批；1：已审批',
+  `commit` int(10) NULL DEFAULT 0 COMMENT '0: 未提交； 1：已提交',
+  `release` int(10) NULL DEFAULT 0 COMMENT '0: 未发布；2：已发布',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of form
+-- ----------------------------
+INSERT INTO `form` VALUES (1, '设备流水', NULL, NULL, NULL, 0, 0, 0);
+
+-- ----------------------------
+-- Table structure for form_temp
+-- ----------------------------
+DROP TABLE IF EXISTS `form_temp`;
+CREATE TABLE `form_temp`  (
+  `id` int(255) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `form_json` json NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of form_temp
+-- ----------------------------
+INSERT INTO `form_temp` VALUES (1, '设备', NULL);
+INSERT INTO `form_temp` VALUES (2, '设备1', '{\"list\": [{\"key\": \"input_1651052163688\", \"help\": \"\", \"type\": \"input\", \"label\": \"订单号\", \"model\": \"input_1651052163688\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"type\": \"text\", \"width\": \"100%\", \"hidden\": false, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"addonAfter\": \"\", \"addonBefore\": \"\", \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}, {\"key\": \"textarea_1651052165210\", \"help\": \"\", \"type\": \"textarea\", \"label\": \"文本框\", \"model\": \"textarea_1651052165210\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"width\": \"100%\", \"hidden\": false, \"maxRows\": 6, \"minRows\": 4, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}], \"config\": {\"layout\": \"horizontal\", \"labelCol\": {\"lg\": 4, \"md\": 4, \"sm\": 4, \"xl\": 4, \"xs\": 4, \"xxl\": 4}, \"labelWidth\": 100, \"wrapperCol\": {\"lg\": 18, \"md\": 18, \"sm\": 18, \"xl\": 18, \"xs\": 18, \"xxl\": 18}, \"customStyle\": \"\", \"labelLayout\": \"flex\", \"hideRequiredMark\": false}}');
+INSERT INTO `form_temp` VALUES (4, '设备3', '{\"list\": [{\"key\": \"input_1651057815239\", \"help\": \"\", \"type\": \"input\", \"label\": \"输入框\", \"model\": \"input_1651057815239\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"type\": \"text\", \"width\": \"100%\", \"hidden\": false, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"addonAfter\": \"\", \"addonBefore\": \"\", \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}], \"config\": {\"layout\": \"horizontal\", \"labelCol\": {\"lg\": 4, \"md\": 4, \"sm\": 4, \"xl\": 4, \"xs\": 4, \"xxl\": 4}, \"labelWidth\": 100, \"wrapperCol\": {\"lg\": 18, \"md\": 18, \"sm\": 18, \"xl\": 18, \"xs\": 18, \"xxl\": 18}, \"customStyle\": \"\", \"labelLayout\": \"flex\", \"hideRequiredMark\": false}}');
+INSERT INTO `form_temp` VALUES (5, '模板2', '{\"list\": [{\"key\": \"input_1651328555040\", \"help\": \"\", \"type\": \"input\", \"label\": \"输入框\", \"model\": \"input_1651328555040\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"type\": \"text\", \"width\": \"100%\", \"hidden\": false, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"addonAfter\": \"\", \"addonBefore\": \"\", \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}, {\"key\": \"input_1651328556741\", \"help\": \"\", \"type\": \"input\", \"label\": \"输入框\", \"model\": \"input_1651328556741\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"type\": \"text\", \"width\": \"100%\", \"hidden\": false, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"addonAfter\": \"\", \"addonBefore\": \"\", \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}, {\"key\": \"input_1651328555857\", \"help\": \"\", \"type\": \"input\", \"label\": \"输入框\", \"model\": \"input_1651328555857\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"type\": \"text\", \"width\": \"100%\", \"hidden\": false, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"addonAfter\": \"\", \"addonBefore\": \"\", \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}, {\"key\": \"input_1651328557757\", \"help\": \"\", \"type\": \"input\", \"label\": \"输入框\", \"model\": \"input_1651328557757\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"type\": \"text\", \"width\": \"100%\", \"hidden\": false, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"addonAfter\": \"\", \"addonBefore\": \"\", \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}, {\"key\": \"textarea_1651328559107\", \"help\": \"\", \"type\": \"textarea\", \"label\": \"文本框\", \"model\": \"textarea_1651328559107\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"width\": \"100%\", \"hidden\": false, \"maxRows\": 6, \"minRows\": 4, \"disabled\": false, \"clearable\": false, \"maxLength\": null, \"placeholder\": \"请输入\", \"defaultValue\": \"\"}}, {\"key\": \"date_1651328560990\", \"help\": \"\", \"type\": \"date\", \"label\": \"日期选择框\", \"model\": \"date_1651328560990\", \"rules\": [{\"message\": \"必填项\", \"required\": false}], \"options\": {\"range\": false, \"width\": \"100%\", \"format\": \"YYYY-MM-DD\", \"hidden\": false, \"disabled\": false, \"showTime\": false, \"clearable\": false, \"placeholder\": \"请选择\", \"defaultValue\": \"\", \"rangePlaceholder\": [\"开始时间\", \"结束时间\"], \"rangeDefaultValue\": []}}], \"config\": {\"layout\": \"horizontal\", \"labelCol\": {\"lg\": 4, \"md\": 4, \"sm\": 4, \"xl\": 4, \"xs\": 4, \"xxl\": 4}, \"labelWidth\": 100, \"wrapperCol\": {\"lg\": 18, \"md\": 18, \"sm\": 18, \"xl\": 18, \"xs\": 18, \"xxl\": 18}, \"customStyle\": \"\", \"labelLayout\": \"flex\", \"hideRequiredMark\": false}}');
 
 -- ----------------------------
 -- Table structure for menu
