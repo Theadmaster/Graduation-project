@@ -46,6 +46,10 @@ const routes = [
             {
                 path: '/template',
                 component: () => import('views/series/temp')
+            },
+            {
+                path: '/archives',
+                component: () => import('views/series/archives')
             }
         ]
     },
