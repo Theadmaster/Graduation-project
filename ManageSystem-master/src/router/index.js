@@ -52,8 +52,12 @@ const routes = [
                 component: () => import('views/series/archives')
             },
             {
-                path: '/account',
-                component: () => import('views/series/account')
+                path: '/accounts',
+                component: () => import('views/series/accounts')
+            },
+            {
+                path: '/tasks',
+                component: () => import('views/series/tasks')
             }
         ]
     },

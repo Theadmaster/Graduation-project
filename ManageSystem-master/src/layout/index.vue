@@ -186,8 +186,8 @@ export default {
   }
 
   .breadcrumb {
-    position: relative;
-    left: 50px;
+    
+    margin-left: 20px;
   }
 
   .el-breadcrumb {
