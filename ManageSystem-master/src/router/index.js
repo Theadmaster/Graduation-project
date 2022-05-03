@@ -50,6 +50,10 @@ const routes = [
             {
                 path: '/archives',
                 component: () => import('views/series/archives')
+            },
+            {
+                path: '/account',
+                component: () => import('views/series/account')
             }
         ]
     },

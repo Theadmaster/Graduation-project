@@ -1,12 +1,13 @@
 <template>
   <div>
     <el-container class="home-container">
-      <el-header>
+      <el-header class="el-head">
         <div class="logo">
-          <!-- <span>神行者</span> -->
-          <img src="~/assets/logo.svg" alt="">
-          <i :class="collapseIcon" @click="collapseClick"></i>
+          <span>台账管理系统</span>
+          <!-- <img src="~/assets/logo.svg" alt=""> -->
+          
         </div>
+        <i class="col" :class="collapseIcon" @click="collapseClick"></i>
         <div class="breadcrumb"> 
             <el-breadcrumb separator="/">
               <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
@@ -31,9 +32,8 @@
               <el-menu
               :default-active="this.$router.history.current.path"
               class="el-menu-vertical-demo"
-              background-color="#222526"
-              active-text-color="#fff"
-              text-color="#95afc0"
+              background-color="#2d3d51"
+              text-color="#ccc"
               :collapse="isCollapse"
               router
               >
@@ -128,7 +128,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
   .el-header {
     background-color: #fff;
     color: #333;
@@ -137,22 +137,27 @@ export default {
     padding: 0;
     display: flex;
     align-items: center;
+    box-shadow: 0 2px 3px #eee;
   }
   
   .el-aside {
-    background-color: #222526;
+    background-color: #2d3d51;
     color: #333;
     line-height: 200px;
   }
   
   .el-main {
-    background-color: #e0e8f5;
+    // background-color: #e0e8f5;
   }
 
   .home-container {
     height: 100vh;
   }
-  
+  .el-head i{
+      font-size: 22px;
+      cursor:pointer;
+      margin-left: 20px;
+  }
   .el-menu-vertical-demo {
     font-weight: 500;
     border-right: 0;
@@ -161,7 +166,7 @@ export default {
   .logo {
     padding-left: 20px;
     width: 210px;
-    background-color: #f5f6fa;
+    background-color: #fff;
   }
 
   .logo img {
@@ -169,15 +174,13 @@ export default {
   }
 
   .logo span {
-    font-size: 24px;
+    width: 160px;
+    font-size: 20px;
     font-weight: 700;
-    color: #fff;
+    color: #000;
   }
 
-  .logo i {
-    position: relative;
-    left: 50px;
-    top: 2.5px;
+  .col {
     font-size: 22px;
     cursor:pointer;
   }

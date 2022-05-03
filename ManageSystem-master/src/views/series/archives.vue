@@ -74,7 +74,7 @@
 
 
     <!-- 详情对话框 -->
-    <el-dialog title="模板详情" :visible.sync="infoDialogVisible" width="700px">
+    <el-dialog title="台账详情" :visible.sync="infoDialogVisible" width="700px">
       <tempBuild :tempData="tempData" />
     </el-dialog>
     <!-- 详情对话框 -->
