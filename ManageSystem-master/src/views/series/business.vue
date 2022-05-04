@@ -74,7 +74,7 @@
     <!-- 添加对话框 -->
     <el-dialog
       v-if="addDialogVisible"
-      title="新建角色"
+      title="新建业务单位"
       :visible.sync="addDialogVisible"
       width="700px"
     >

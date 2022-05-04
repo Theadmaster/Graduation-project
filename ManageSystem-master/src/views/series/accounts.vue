@@ -47,6 +47,14 @@
             >导出 Excel</el-button
           ></div>
         <div class="search-group">
+            <div style="margin-right: 5px;">
+                <el-date-picker
+                    size="mini"
+                    v-model="dateValue"
+                    type="date"
+                    placeholder="选择日期">
+                </el-date-picker>
+            </div>
           <div style="margin-right: 5px">
             <el-input
               size="mini"
@@ -93,7 +101,7 @@
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >查看详情</el-button
             >
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
+            <el-button @click="handleCommit(scope.row)" type="text" size="small"
               >发布</el-button
             >
           </template>
@@ -101,6 +109,70 @@
       </el-table>
     </el-card>
     <!-- /列表栏 -->
+
+    <!-- 添加对话框 -->
+    <el-dialog
+      v-if="addDialogVisible"
+      title="新建角色"
+      :visible.sync="addDialogVisible"
+      width="700px"
+    >
+      <el-form
+        ref="create"
+        :model="createForm"
+        :rules="rules"
+        label-position="left"
+        label-width="80px"
+        style="padding: 0 20px"
+        @keyup.enter.native="submitForm('create')"
+      >
+        <el-form-item label="台账名称" prop="name">
+          <el-input
+            v-model="createForm.name"
+            maxlength="20"
+            clearable
+            placeholder="请输入业务单位名称"
+          />
+        </el-form-item>
+        <el-form-item label="截止日期" prop="date">
+          <el-input
+            v-model="createForm.contact"
+            maxlength="20"
+            clearable
+            placeholder="请输入联系人姓名"
+          />
+        </el-form-item>
+        
+        <el-form-item label="台账模版" prop="role_id">
+          <el-select
+            v-model="createForm.formTempId"
+            
+            filterable
+            clearable
+            placeholder="请选择模版"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="temp in tempOptions"
+              :key="temp.value"
+              :label="temp.name"
+              :value="temp.value"
+            />
+          </el-select>
+        </el-form-item>
+        
+        
+        
+
+        <el-form-item>
+          <el-button type="primary" size="mini" @click="submitForm('create')"
+            >创建</el-button
+          >
+          <!-- <el-button @click="resetForm('create')">重置</el-button> -->
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <!-- 添加对话框 -->
 
 
 
@@ -144,7 +216,8 @@ export default {
           id: 1,
           name: "设备",
           status: 1,
-          date: '2022-05-02'
+          date: '2022-05-02',
+          form_json: '{"list": [{"key": "input_1651328555040", "help": "", "type": "input", "label": "输入框", "model": "input_1651328555040", "rules": [{"message": "必填项", "required": false}], "options": {"type": "text", "width": "100%", "hidden": false, "disabled": false, "clearable": false, "maxLength": null, "addonAfter": "", "addonBefore": "", "placeholder": "请输入", "defaultValue": ""}}, {"key": "input_1651328556741", "help": "", "type": "input", "label": "输入框", "model": "input_1651328556741", "rules": [{"message": "必填项", "required": false}], "options": {"type": "text", "width": "100%", "hidden": false, "disabled": false, "clearable": false, "maxLength": null, "addonAfter": "", "addonBefore": "", "placeholder": "请输入", "defaultValue": ""}}, {"key": "input_1651328555857", "help": "", "type": "input", "label": "输入框", "model": "input_1651328555857", "rules": [{"message": "必填项", "required": false}], "options": {"type": "text", "width": "100%", "hidden": false, "disabled": false, "clearable": false, "maxLength": null, "addonAfter": "", "addonBefore": "", "placeholder": "请输入", "defaultValue": ""}}, {"key": "input_1651328557757", "help": "", "type": "input", "label": "输入框", "model": "input_1651328557757", "rules": [{"message": "必填项", "required": false}], "options": {"type": "text", "width": "100%", "hidden": false, "disabled": false, "clearable": false, "maxLength": null, "addonAfter": "", "addonBefore": "", "placeholder": "请输入", "defaultValue": ""}}, {"key": "textarea_1651328559107", "help": "", "type": "textarea", "label": "文本框", "model": "textarea_1651328559107", "rules": [{"message": "必填项", "required": false}], "options": {"width": "100%", "hidden": false, "maxRows": 6, "minRows": 4, "disabled": false, "clearable": false, "maxLength": null, "placeholder": "请输入", "defaultValue": ""}}, {"key": "date_1651328560990", "help": "", "type": "date", "label": "日期选择框", "model": "date_1651328560990", "rules": [{"message": "必填项", "required": false}], "options": {"range": false, "width": "100%", "format": "YYYY-MM-DD", "hidden": false, "disabled": false, "showTime": false, "clearable": false, "placeholder": "请选择", "defaultValue": "", "rangePlaceholder": ["开始时间", "结束时间"], "rangeDefaultValue": []}}], "config": {"layout": "horizontal", "labelCol": {"lg": 4, "md": 4, "sm": 4, "xl": 4, "xs": 4, "xxl": 4}, "labelWidth": 100, "wrapperCol": {"lg": 18, "md": 18, "sm": 18, "xl": 18, "xs": 18, "xxl": 18}, "customStyle": "", "labelLayout": "flex", "hideRequiredMark": false}}'
         },
         {
             id: 2,
@@ -167,19 +240,36 @@ export default {
       ],
       listLoading: false,
       currentRow: null,
+      addDialogVisible: false,
       editDialogVisible: false,
       infoDialogVisible: false,
       tempData: '',
       listQuery: {
         currentPage: 1,
-        pageSize: 20,
-        total: 400,
+        pageSize: 1,
+        total: 4,
         searchInfo: "",
       },
       createForm: {
         name: "",
-        json: "",
+        date: '',
+        formTempId: ''
       },
+      tempOptions: [
+          {
+              value: 1,
+              name: '设备'
+
+          },
+          {
+              value:2,
+              name:"设备2"
+          },
+          {
+              value: 3,
+              name: '设备3'
+          }
+      ],
       bookType: '',
       options: [
           {
@@ -194,8 +284,8 @@ export default {
               label: 'txt',
               value: 3
           }
-      ]
-      
+      ],
+      dateValue: ''
     };
   },
   computed: {
@@ -249,6 +339,9 @@ export default {
     /**
      * 提交表单
      */
+    handleCommit(item) {
+
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -264,7 +357,8 @@ export default {
     },
     // 跳转表单创建页面
     addClick() {
-      this.$router.push("/tempDesign");
+    //   this.$router.push("/tempDesign");
+        this.addDialogVisible = true
     },
     handleClick(row) {
       this.infoDialogVisible = true

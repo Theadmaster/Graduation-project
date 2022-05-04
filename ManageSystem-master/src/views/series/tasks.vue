@@ -201,8 +201,8 @@ export default {
       tempData: '',
       listQuery: {
         currentPage: 1,
-        pageSize: 20,
-        total: 400,
+        pageSize: 1,
+        total: 4,
         searchInfo: "",
       },
       createForm: {
