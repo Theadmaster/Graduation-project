@@ -18,6 +18,9 @@ router.post('/updateTemp', tempHandler.updateTempById)
 
 router.post('/deleteTemp/:id', tempHandler.deleteTempById)
 
+// 导出 Excel
+// router.get('/excel', tempHandler.getExcel)
+
 
 // 将路由对象共享出去
 module.exports = router

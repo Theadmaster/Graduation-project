@@ -43,7 +43,7 @@
             type="primary"
             icon="el-icon-s-order"
             size="mini"
-            @click="deleteClick"
+            @click="exportClick"
             >导出 Excel</el-button
           ></div>
         <div class="search-group">
@@ -58,7 +58,7 @@
           <div style="margin-right: 5px">
             <el-input
               size="mini"
-              placeholder="请输入文件名"
+              placeholder="请输入台账名"
               @keyup.enter="getList"
               prefix-icon="el-icon-search"
               v-model="listQuery.searchInfo"
@@ -89,13 +89,13 @@
         style="width: 100%"
       >
         <el-table-column width="100px" align="center" prop="id" label="序号"> </el-table-column>
-        <el-table-column prop="name" label="台账名称"> </el-table-column>
+        <el-table-column prop="form_name" label="台账名称"> </el-table-column>
         <el-table-column  label="当前状态">
             <template slot-scope="scope">
                 <el-tag :type="scope.row.status===1?'':(scope.row.status===2? 'success': (scope.row.status===3? 'warning': 'info'))" size="mini">{{getStatus( scope.row.status)}}</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="date" label="发布时间"> </el-table-column>
+        <el-table-column prop="form_date" label="发布时间"> </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">
           <template slot-scope="scope" >
             <el-button @click="handleClick(scope.row)" type="text" size="small"
@@ -120,7 +120,6 @@
       <el-form
         ref="create"
         :model="createForm"
-        :rules="rules"
         label-position="left"
         label-width="80px"
         style="padding: 0 20px"
@@ -128,19 +127,19 @@
       >
         <el-form-item label="台账名称" prop="name">
           <el-input
-            v-model="createForm.name"
+            v-model="createForm.tempName"
             maxlength="20"
             clearable
-            placeholder="请输入业务单位名称"
+            placeholder="请输入台账名称"
           />
         </el-form-item>
         <el-form-item label="截止日期" prop="date">
-          <el-input
-            v-model="createForm.contact"
-            maxlength="20"
-            clearable
-            placeholder="请输入联系人姓名"
-          />
+          <el-date-picker
+              v-model="createForm.tempDate"
+              type="date"
+              placeholder="选择日期">
+          </el-date-picker>
+          
         </el-form-item>
         
         <el-form-item label="台账模版" prop="role_id">
@@ -154,9 +153,9 @@
           >
             <el-option
               v-for="temp in tempOptions"
-              :key="temp.value"
+              :key="temp.id"
               :label="temp.name"
-              :value="temp.value"
+              :value="temp.id"
             />
           </el-select>
         </el-form-item>
@@ -223,7 +222,8 @@ export default {
             id: 2,
             name: '设备2',
             status: 2,
-            date: '2022-05-02'
+            date: '2022-05-02',
+            form_json: '{"list":[{"type":"input","label":"姓名","options":{"type":"text","width":"100%","defaultValue":"123","placeholder":"请输入","clearable":false,"maxLength":null,"addonBefore":"","addonAfter":"","hidden":false,"disabled":false},"model":"小红","key":"input_1651754809279","help":"","rules":[{"required":false,"message":"必填项"}]},{"type":"input","label":"输入框","options":{"type":"text","width":"100%","defaultValue":"","placeholder":"请输入","clearable":false,"maxLength":null,"addonBefore":"","addonAfter":"","hidden":false,"disabled":false},"model":"input_1651754868868","key":"input_1651754868868","help":"","rules":[{"required":false,"message":"必填项"}]},{"type":"input","label":"输入框","options":{"type":"text","width":"100%","defaultValue":"","placeholder":"请输入","clearable":false,"maxLength":null,"addonBefore":"","addonAfter":"","hidden":false,"disabled":false},"model":"input_1651754882823","key":"input_1651754882823","help":"","rules":[{"required":false,"message":"必填项"}]},{"type":"input","label":"输入框","options":{"type":"text","width":"100%","defaultValue":"","placeholder":"请输入","clearable":false,"maxLength":null,"addonBefore":"","addonAfter":"","hidden":false,"disabled":false},"model":"input_1651754884904","key":"input_1651754884904","help":"","rules":[{"required":false,"message":"必填项"}]},{"type":"input","label":"输入框","options":{"type":"text","width":"100%","defaultValue":"","placeholder":"请输入","clearable":false,"maxLength":null,"addonBefore":"","addonAfter":"","hidden":false,"disabled":false},"model":"input_1651754886752","key":"input_1651754886752","help":"","rules":[{"required":false,"message":"必填项"}]}],"config":{"layout":"inline","labelCol":{"xs":4,"sm":4,"md":4,"lg":4,"xl":4,"xxl":4},"labelWidth":100,"labelLayout":"flex","wrapperCol":{"xs":18,"sm":18,"md":18,"lg":18,"xl":18,"xxl":18},"hideRequiredMark":false,"customStyle":""}}'
         },
         {
             id: 3,
@@ -251,25 +251,11 @@ export default {
         searchInfo: "",
       },
       createForm: {
-        name: "",
-        date: '',
+        tempName: "",
+        tempDate: '',
         formTempId: ''
       },
-      tempOptions: [
-          {
-              value: 1,
-              name: '设备'
-
-          },
-          {
-              value:2,
-              name:"设备2"
-          },
-          {
-              value: 3,
-              name: '设备3'
-          }
-      ],
+      tempOptions: [],
       bookType: '',
       options: [
           {
@@ -293,7 +279,8 @@ export default {
     
   },
   created() {
-    // this.getList();
+    this.getList();
+    this.getTemps()
   },
   methods: {
       // 获取status信息
@@ -306,7 +293,7 @@ export default {
     getList() {
       console.log(this.listQuery);
       request({
-        url: `/temp/getTemp?${qs.stringify(this.listQuery)} `,
+        url: `/account/getAccounts?${qs.stringify(this.listQuery)} `,
         method: "get",
       })
         .then((res) => {
@@ -324,6 +311,16 @@ export default {
           console.log(err);
         });
     },
+    getTemps() {
+      request({
+        url: `/account/getTemps`
+      }).then( res => {
+        console.log(res);
+        this.tempOptions = res.data
+      }).catch( err => {
+        console.log(err);
+      })
+    },
     /**
      * 改变pagesize
      */
@@ -340,13 +337,41 @@ export default {
      * 提交表单
      */
     handleCommit(item) {
-
+      console.log(item);
+      try {
+        // const {data: res} = 
+      } catch (error) {
+        
+      }
+    },
+    async handleBuild(){
+      console.log(this.createForm);
+      try {
+        let res = await request({
+          url: `/account/buildAccount`,
+          method: 'post',
+          data: qs.stringify(this.createForm)
+        })
+        console.log(res);
+        if (res.status === 0) {
+          this.addDialogVisible = false
+          this.$notify.success({
+            title: "成功",
+            message: res.message,
+            duration: 1500,
+          })
+          this.getList()
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (formName) {
             case "create":
+              this.handleBuild()
               break;
             case "edit":
               this.handleEdit();
@@ -355,10 +380,36 @@ export default {
         }
       });
     },
+    // 导出
+    exportClick() {
+        // try {
+        //     let res = await request({url: `/temp/excel`})
+        //     console.log(res);
+        // } catch (error) {
+        //     console.log(error);
+        // }
+        let obj = JSON.parse(this.list[0].form_json)
+        
+        import('@/vendor/Export2Excel').then(excel => {
+        let tHeader = ['name', 'sex', 'age']
+        let data = ['gert', 'male', '20']
+        const list = this.list
+        
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          
+          bookType: 'xlsx'
+        })
+        
+      })
+        
+    },
     // 跳转表单创建页面
     addClick() {
     //   this.$router.push("/tempDesign");
         this.addDialogVisible = true
+        
     },
     handleClick(row) {
       this.infoDialogVisible = true

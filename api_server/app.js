@@ -53,6 +53,10 @@ app.use('/business', businessRouter)
 const tempRouter = require('./router/temp')
 app.use('/temp', tempRouter)
 
+// 导入台账模块
+const accountRouter = require('./router/account')
+app.use('/account', accountRouter)
+
 // 导入使用文章分类路由模块
 const articleCateRouter = require('./router/articleCate')
 app.use('/my/article', articleCateRouter)

@@ -1,10 +1,9 @@
 const db = require('../db/index')
 const qs = require('qs')
-// const nodeExcel = require('excel-export')
 
 
 // 获取模板列表
-exports.getTemp = (req, res) => {
+exports.getAccounts = (req, res) => {
     let query = qs.parse(req.query)
     
     // debug
@@ -13,18 +12,18 @@ exports.getTemp = (req, res) => {
     let currentPage = (query.currentPage - 1) * query.pageSize
 
     const sqlSearch = `select *
-                        from form_temp
-                        where name like '%${query.searchInfo}%'
+                        from form
+                        where form_name like '%${query.searchInfo}%'
                         order by id asc 
                         limit ${currentPage}, ${query.pageSize}`
     const sqlSearch1 = `select count(*) as id_count 
-                        from form_temp 
-                        where name like '%${query.searchInfo}%'`
+                        from form 
+                        where form_name like '%${query.searchInfo}%'`
     const sql = `select *
-                from form_temp 
+                from form 
                 order by id asc
                 limit ${currentPage}, ${query.pageSize}`
-    const sql1 = `select count(*) as id_count from form_temp`
+    const sql1 = `select count(*) as id_count from form`
     let total = 0;
     const p1 = new Promise((resolve, reject) => {
         if (query.searchInfo != '') {
@@ -64,7 +63,7 @@ exports.getTemp = (req, res) => {
         obj.currentPage = query.currentPage
         res.send({
             status: 0,
-            message: '获取模板列表成功',
+            message: '获取台账列表成功',
             data: obj
         })
     }).catch( e => {
@@ -72,9 +71,36 @@ exports.getTemp = (req, res) => {
     })
 }
 
+// 获取模版options
+exports.getTemps = (req, res) => {
+    const sql = `select * from form_temp order by id asc` 
+    db.query(sql, (err, results) => {
+        if(err) return res.cc(err)
+        res.send({
+            status: 0,
+            message: '获取模版列表成功',
+            data: results
+        })
+    })
+}
+
 
 // 创建表单模板
-exports.buildTemp = (req, res) => {
+exports.buildAccount = (req, res) => {
+    const body = qs.parse(req.body)
+    // console.log(body);
+    const sql = `insert into form(form_name, form_date, form_temp_id) values(?,?,?)`
+    const values = [body.tempName, body.tempDate, body.formTempId]
+    db.query(sql, values, (err, results) => {
+        if (err) return res.cc(err)
+        if (results.affectedRows !== 1)
+            return res.cc('插入台账失败')
+        res.cc('插入台账成功', 0)
+    })
+}
+
+// 发布台账
+exports.commitAccount = (req, res) => {
     const body = qs.parse(req.body)
     // console.log(body);
     const sql = `insert into form_temp(name, form_json) values(?,?)`
@@ -88,7 +114,7 @@ exports.buildTemp = (req, res) => {
 }
 
 
-exports.updateTempById = (req, res) => {
+exports.updateAccountById = (req, res) => {
     const body = qs.parse(req.body)
     console.log(body);
     const sql = `update form_temp set name=? where id=? `
@@ -100,7 +126,7 @@ exports.updateTempById = (req, res) => {
     })
 }
 
-exports.deleteTempById = (req, res) => {
+exports.deleteAccountById = (req, res) => {
     const sql = `delete from form_temp where id=?`
     db.query(sql, req.params.id, (err, results) => {
         if (err) return res.cc(err)
