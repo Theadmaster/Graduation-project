@@ -57,6 +57,10 @@ app.use('/temp', tempRouter)
 const accountRouter = require('./router/account')
 app.use('/account', accountRouter)
 
+// 导入任务模块
+const taskRouter = require('./router/task')
+app.use('/task', taskRouter)
+
 // 导入使用文章分类路由模块
 const articleCateRouter = require('./router/articleCate')
 app.use('/my/article', articleCateRouter)

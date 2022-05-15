@@ -10,6 +10,7 @@ const expressJoi = require('@escook/express-joi')
 // 获取台账列表
 router.get('/getAccounts', accountHandler.getAccounts)
 
+// 获取台账模版列表
 router.get('/getTemps', accountHandler.getTemps)
 
 // 创建台账
@@ -17,6 +18,8 @@ router.post('/buildAccount', accountHandler.buildAccount)
 
 // 发布台账
 router.post('/commitAccount/:id', accountHandler.commitAccount)
+
+router.get('/getAccountDetail', accountHandler.getAccountDetail)
 
 
 // 导出 Excel

@@ -43,7 +43,7 @@
             type="primary"
             icon="el-icon-s-order"
             size="mini"
-            @click="deleteClick"
+            @click="exportClick"
             >导出 Excel</el-button
           >
         </div>
@@ -109,20 +109,20 @@
         style="width: 100%"
       >
         <el-table-column width="100px" align="center" prop="id" label="序号"> </el-table-column>
-        <el-table-column prop="name" label="台账名称"> </el-table-column>
-        <el-table-column prop="name" label="当前状态">
+        <el-table-column prop="form_name" label="台账名称"> </el-table-column>
+        <el-table-column prop="status" label="当前状态">
             <template slot-scope="scope">
                 <el-tag :type="scope.row.status===1?'':(scope.row.status===2? 'warning': (scope.row.status===3? 'success': 'info'))" size="mini">{{getStatus( scope.row.status)}}</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="date" label="发布时间"> </el-table-column>
+        <el-table-column prop="form_date" label="发布时间"> </el-table-column>
 
         <el-table-column fixed="right" label="操作" width="150">
           <template slot-scope="scope" >
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >查看详情</el-button
             >
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
+            <el-button @click="handleCommit(scope.row)" type="text" size="small"
               >提交</el-button
             >
           </template>
@@ -136,6 +136,7 @@
     <!-- 详情对话框 -->
     <el-dialog title="模板详情" :visible.sync="infoDialogVisible" width="700px">
       <tempBuild :tempData="tempData" />
+      <el-button type="primary" size="mini" @click="finishClick">完成</el-button>
     </el-dialog>
     <!-- 详情对话框 -->
 
@@ -201,7 +202,7 @@ export default {
       tempData: '',
       listQuery: {
         currentPage: 1,
-        pageSize: 1,
+        pageSize: 10,
         total: 4,
         searchInfo: "",
       },
@@ -233,7 +234,7 @@ export default {
     
   },
   created() {
-    // this.getList();
+    this.getList();
   },
   methods: {
       // 获取status信息
@@ -246,7 +247,7 @@ export default {
     getList() {
       console.log(this.listQuery);
       request({
-        url: `/temp/getTemp?${qs.stringify(this.listQuery)} `,
+        url: `/task/getTasks?${qs.stringify(this.listQuery)} `,
         method: "get",
       })
         .then((res) => {
@@ -292,13 +293,19 @@ export default {
         }
       });
     },
-    // 跳转表单创建页面
-    addClick() {
-      this.$router.push("/tempDesign");
-    },
     handleClick(row) {
       this.infoDialogVisible = true
       this.tempData = JSON.parse(row.form_json)
+    },
+    handleCommit(row) {
+      console.log(row);
+    },
+    // 导出
+    exportClick() {
+
+    },
+    finishClick() {
+      
     },
     /**
      * 修改显示框
@@ -307,60 +314,6 @@ export default {
       this.editForm = this.currentRow;
       this.editDialogVisible = true;
       console.log(this.editForm);
-    },
-    /**
-     * 修改
-     */
-    async handleEdit() {
-      this.editForm.id = this.currentRow.id;
-      console.log(this.editForm);
-      let res = await request({
-        url: `/temp/updateTemp`,
-        method: "post",
-        data: qs.stringify(this.editForm),
-      });
-      if (res.status === 0) {
-        this.$notify.success({
-          title: "成功",
-          message: res.message,
-          duration: 1500,
-        });
-        this.editDialogVisible = false;
-        this.getList();
-      } else {
-        this.$notify.error({
-          title: "失败",
-          message: res.message,
-          duration: 1500,
-        });
-      }
-    },
-    /**
-     * 删除
-     */
-    deleteClick() {
-      this.$confirm("删除后无法撤销，确定删除?", "提示", { type: "warning" })
-        .then(() => {
-          request({
-            url: `/temp/deleteTemp/${this.currentRow.id}`,
-            method: "post",
-          }).then((res) => {
-            if (res.status === 0) {
-              this.$notify.success({
-                title: "成功",
-                message: "删除成功",
-                duration: 1500,
-              });
-              if (this.list.length - 1 === 0) {
-                this.listQuery.currentPage -=
-                  this.listQuery.currentPage < 1 ? 0 : 1;
-              }
-              this.getList();
-            }
-          });
-        })
-        .catch(() => {});
-      console.log(this.currentRow);
     },
     /**
      * 选中一行

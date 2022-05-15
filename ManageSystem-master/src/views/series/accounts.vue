@@ -246,7 +246,7 @@ export default {
       tempData: '',
       listQuery: {
         currentPage: 1,
-        pageSize: 1,
+        pageSize: 10,
         total: 4,
         searchInfo: "",
       },
@@ -336,10 +336,21 @@ export default {
     /**
      * 提交表单
      */
-    handleCommit(item) {
+    async handleCommit(item) {
       console.log(item);
       try {
-        // const {data: res} = 
+        const res = await request({
+          url: `/account/commitAccount/${item.id}`,
+          method: 'post'
+        })
+        console.log(res);
+        if(res.status === 0) {
+          this.getList()
+          this.$message.success({
+            message: '发布成功'
+          })
+        }
+        
       } catch (error) {
         
       }

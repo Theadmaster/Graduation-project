@@ -44,7 +44,6 @@ exports.getAccounts = (req, res) => {
         if (query.searchInfo != '') {
             db.query(sqlSearch, (err, results) => {
                 if (err) return reject(err)
-                console.log(results);
                 resolve(results)
             })
         } else {
@@ -89,28 +88,50 @@ exports.getTemps = (req, res) => {
 exports.buildAccount = (req, res) => {
     const body = qs.parse(req.body)
     // console.log(body);
-    const sql = `insert into form(form_name, form_date, form_temp_id) values(?,?,?)`
-    const values = [body.tempName, body.tempDate, body.formTempId]
-    db.query(sql, values, (err, results) => {
-        if (err) return res.cc(err)
-        if (results.affectedRows !== 1)
-            return res.cc('插入台账失败')
-        res.cc('插入台账成功', 0)
+    const sql = `insert into form(form_name, form_date, form_temp_id, form_json) values(?,?,?,?)`
+    const sql1 = `select form_json from form_temp where id=${body.formTempId}`
+    let values = [body.tempName, body.tempDate, body.formTempId]
+    const p = new Promise((resolve, reject) => {
+        db.query(sql1, (err, results) => {
+            if(err) res.cc(err)
+            resolve(results)
+        })
     })
+    p.then(res1 => {
+        console.log(res1);
+        values.push(res1[0].form_json)
+        db.query(sql, values, (err, results) => {
+            if (err) return res.cc(err)
+            if (results.affectedRows !== 1)
+                return res.cc('插入台账失败')
+            res.cc('创建台账成功', 0)
+        })
+    })
+    
+    
+
 }
 
 // 发布台账
 exports.commitAccount = (req, res) => {
-    const body = qs.parse(req.body)
+    // const body = qs.parse(req.body)
     // console.log(body);
-    const sql = `insert into form_temp(name, form_json) values(?,?)`
-    const values = [body.tempName, body.tempJson]
+    const sql = `update form set status=${2} where id=?`
+    const values = [req.params.id]
     db.query(sql, values, (err, results) => {
-        if (err) return res.cc(err)
+        if (err) {
+            console.log(err);
+            return res.cc(err)
+        }
         if (results.affectedRows !== 1)
-            return res.cc('插入模板失败')
-        res.cc('插入模板成功', 0)
+            return res.cc('发布失败')
+        res.cc('发布成功', 0)
     })
+}
+
+// 查看详情
+exports.getAccountDetail = (req, res) => {
+
 }
 
 
