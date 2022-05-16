@@ -11,7 +11,10 @@ const expressJoi = require('@escook/express-joi')
 router.get('/getTasks', taskHandler.getTasks)
 
 // 提交台账
-router.post('/commitAccount', taskHandler.commitTask)
+router.post('/commitTask', taskHandler.commitTask)
+
+// 完成台账信息
+router.post('/finishTask', taskHandler.finishTask)
 
 
 // 导出 Excel

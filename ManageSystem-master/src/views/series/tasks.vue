@@ -135,10 +135,12 @@
 
     <!-- 详情对话框 -->
     <el-dialog title="模板详情" :visible.sync="infoDialogVisible" width="700px">
-      <tempBuild :tempData="tempData" />
+      <!-- <tempBuild ref="kfb" :tempData="tempData" /> -->
+      <k-form-build ref="kfb" :value="tempData"></k-form-build>
       <el-button type="primary" size="mini" @click="finishClick">完成</el-button>
     </el-dialog>
     <!-- 详情对话框 -->
+    
 
     <!-- 分页栏 -->
     <div class="footer">
@@ -199,7 +201,9 @@ export default {
       currentRow: null,
       editDialogVisible: false,
       infoDialogVisible: false,
+      handleRow: null,
       tempData: '',
+      currentId: '',
       listQuery: {
         currentPage: 1,
         pageSize: 10,
@@ -294,17 +298,69 @@ export default {
       });
     },
     handleClick(row) {
-      this.infoDialogVisible = true
+      // this.$refs.kfb.reset()
+      this.handleRow = row
       this.tempData = JSON.parse(row.form_json)
+      // console.log(JSON.parse(row.form_data));
+
+      this.infoDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.kfb.setData(JSON.parse(row.form_data)).then(res => {
+          console.log(res);
+        }).catch(err => {
+          console.log(err);
+        })
+      })
+      this.currentId = row.id
     },
-    handleCommit(row) {
+    async handleCommit(row) {
       console.log(row);
+      try {
+        let res = await request({
+          url: `/task/commitTask`,
+          method: 'post',
+          data: qs.stringify({id: row.id})
+        })
+        if(res.status === 0) {
+          this.getList()
+        }
+      } catch (error) {
+        
+      }
     },
     // 导出
     exportClick() {
 
     },
-    finishClick() {
+    async finishClick() {
+      // this.list.forEach((ele, i, arr) => {
+      //   if(ele.id === this.currentId) {
+      //     arr[i].form_json = this.tempData
+      //   }
+      // })
+      console.log(this.tempData);
+      this.$refs.kfb.getData().then(result => {
+        console.log(result);
+        let query = {id: this.currentId, form_data: JSON.stringify(result)}
+        console.log(query);
+        request({
+          url: `/task/finishTask`,
+          method: 'post',
+          data: qs.stringify(query)
+        }).then(res => {
+          console.log(res);
+          if(res.status === 0) {
+            this.infoDialogVisible = false
+            this.$message.success('保存成功')
+            this.getList()
+          }
+        }).catch(err => {
+          console.log(err);
+        })
+         
+      }).catch(err => {
+        console.log(err);
+      })
       
     },
     /**

@@ -73,21 +73,39 @@ exports.getTasks = (req, res) => {
 
 
 
-// 发布台账
+// 提交任务
 exports.commitTask = (req, res) => {
-    // const body = qs.parse(req.body)
+    const body = qs.parse(req.body)
     // for debug
     // console.log(body);
     const sql = `update form set status=${3} where id=?`
-    const values = [req.params.id]
+    const values = [body.id]
     db.query(sql, values, (err, results) => {
         if (err) {
             console.log(err);
             return res.cc(err)
         }
         if (results.affectedRows !== 1)
-            return res.cc('发布失败')
-        res.cc('发布成功', 0)
+            return res.cc('提交失败')
+        res.cc('提交成功', 0)
+    })
+}
+
+// 保存任务内容
+exports.finishTask = (req, res) => {
+    const body = qs.parse(req.body)
+    // for debug
+    // console.log(body);
+    const sql = `update form set form_data='${body.form_data}' where id=?`
+    const values = [body.id]
+    db.query(sql, values, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.cc(err)
+        }
+        if (results.affectedRows !== 1)
+            return res.cc('保存失败')
+        res.cc('保存成功', 0)
     })
 }
 

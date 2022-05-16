@@ -83,11 +83,15 @@ export default {
   },
   watch: {
     $route: 'breadChange',
+    menu: 'printMenu'
   },
   mounted(){
     console.log(this.menu);
   },
   methods: {
+    printMenu() {
+      console.log(this.menu);
+    },
     /**
      * 折叠导航
      */
@@ -119,6 +123,7 @@ export default {
     handleCommand(command) {
       if(command === 'user') {
         console.log(command);
+        this.printMenu()
       } else {
         this.$router.push('/login')
       } 

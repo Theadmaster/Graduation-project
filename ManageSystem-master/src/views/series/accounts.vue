@@ -177,7 +177,9 @@
 
     <!-- 详情对话框 -->
     <el-dialog title="模板详情" :visible.sync="infoDialogVisible" width="700px">
-      <tempBuild :tempData="tempData" />
+      <!-- <tempBuild :tempData="tempData" /> -->
+      <k-form-build ref="kfb" :value="tempData"></k-form-build>
+      <el-button type="primary" size="mini" @click="finishClick">审批</el-button>
     </el-dialog>
     <!-- 详情对话框 -->
 
@@ -244,6 +246,7 @@ export default {
       editDialogVisible: false,
       infoDialogVisible: false,
       tempData: '',
+      currentRow: null,
       listQuery: {
         currentPage: 1,
         pageSize: 10,
@@ -332,6 +335,26 @@ export default {
      */
     handleCurrentPageChange() {
       this.getList();
+    },
+    async finishClick() {
+      console.log(this.currentRow);
+      
+      try {
+        let res = await request({
+          url: `/account/approvalAccount/${this.currentRow.id}`,
+          method: 'post'
+        })
+        // console.log(res);
+        if(res.status === 0) {
+          this.getList()
+          this.$message.success({
+            message: '审批成功'
+          })
+          this.infoDialogVisible = false
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * 提交表单
@@ -424,7 +447,15 @@ export default {
     },
     handleClick(row) {
       this.infoDialogVisible = true
+      this.currentRow = row
       this.tempData = JSON.parse(row.form_json)
+      this.$nextTick(() => {
+        this.$refs.kfb.setData(JSON.parse(row.form_data)).then(res => {
+          console.log(res);
+        }).catch(err => {
+          console.log(err);
+        })
+      })
     },
     /**
      * 修改显示框

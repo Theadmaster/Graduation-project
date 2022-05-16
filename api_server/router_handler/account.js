@@ -134,6 +134,21 @@ exports.getAccountDetail = (req, res) => {
 
 }
 
+// 审批
+exports.approvalAccount = (req, res) => {
+    console.log(req.params.id);
+    const sql = `update form set status=${4} where id=?`
+    const values = [req.params.id]
+    db.query(sql, values, (err, results) => {
+        if(err) {
+            console.log(err);
+            return res.cc(err)
+        }
+        if (results.affectedRows !== 1) return res.cc('审批失败')
+        res.cc('审批成功', 0)
+    })
+}
+
 
 exports.updateAccountById = (req, res) => {
     const body = qs.parse(req.body)

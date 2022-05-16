@@ -8,7 +8,7 @@ const state = {
     name: '',
     avatar: '',
     user: {},
-    menu: [],
+    menu: localStorage.getItem('menu'),
     role: []
 }
 
@@ -33,6 +33,7 @@ const mutations = {
         state.user = userinfo
     },
     SET_MENU: (state, menu) => {
+        localStorage.setItem('menu', menu)
         state.menu = menu
     },
     SET_ROLE: (state, role) => {

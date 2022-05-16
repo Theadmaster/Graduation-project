@@ -21,6 +21,8 @@ router.post('/commitAccount/:id', accountHandler.commitAccount)
 
 router.get('/getAccountDetail', accountHandler.getAccountDetail)
 
+// 审批
+router.post('/approvalAccount/:id', accountHandler.approvalAccount)
 
 // 导出 Excel
 // router.get('/excel', tempHandler.getExcel)
